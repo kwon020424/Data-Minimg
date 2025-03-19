@@ -1,0 +1,37 @@
+##iris
+str(iris)
+View(iris)
+##apply
+##column.sum
+apply(iris[,1:4],2,sum) ##열 계산
+apply(iris[,1:4],2,mean)
+apply(iris[,1:4],2,min)
+summary(iris[,1:4]) ## 기초통계량
+lapply(iris[,1:4],sum)
+sapply(iris[,1:4],min)
+sapply(iris[,1:4],mean)
+
+##csv
+inf<-read.csv("C:/DataMIning/infant.csv")
+inf
+View(inf)
+setwd("C:/DataMIning")
+str(inf)
+plot(inf$age, inf$weight)
+head(inf) ##6 lines show
+lm(inf$age~inf$weight, data = inf)
+fit<-lm(inf$age~inf$weight, data = inf)
+abline(fit)
+summary(fit)
+
+library(vcd)
+help(package = "vcd")
+data(Arthritis)
+head(Arthritis)
+str(Arthritis)
+names(Arthritis)
+dim(Arthritis) ##결측치 확인
+length(Arthritis)
+colnames(Arthritis)
+hist(inf$age)
+hist(inf$weight)

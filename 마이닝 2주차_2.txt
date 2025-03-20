@@ -1,0 +1,26 @@
+##csv
+data(Hitters)
+colnames(Hitters)
+Hitters<-read.csv("C:/DataMIning/Hitters.csv")
+dim(Hitters)
+str(Hitters)
+help(Hitters)
+##결측치확인
+is.na(Hitters)
+N_Hitters<-na.omit(Hitters)##결측치 제거
+is.na(N_Hitters)
+dim(N_Hitters)
+n_mean_salary<-mean(Hitters$Salary, na.rm=TRUE)
+n_mean_salary
+mean_salary<-mean(Hitters$Salary)
+is.na(Hitters)
+mean_salary<-mean(Hitters$Salary)
+mean_salary
+##결측치값 대체
+library(VIM)
+S_Hitters<-kNN(Hitters, k=3)
+dim(S_Hitters)
+dim(Hitters)
+View(S_Hitters)
+s_mean<-mean(S_Hitters$Salary)
+s_mean

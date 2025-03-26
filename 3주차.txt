@@ -1,0 +1,32 @@
+##데이터의 정보에 대해 정리하라
+help(airquality)
+View(airquality)
+
+##데이터의 변수이름과 자료형을 써라
+str(airquality)
+
+
+##결측값의 존재의 대해 변수별로 정리하고 그 개수를 확인하라
+sum(is.na(airquality$Ozone))
+sum(is.na(airquality$Solar.R))
+sum(is.na(airquality$Wind))
+sum(is.na(airquality$Month))
+sum(is.na(airquality$Temp))
+sum(is.na(airquality$Day))
+
+##결측치를 제거하고 데이터를 저장하여 기술통꼐량을 출력하라
+N_airquality<-na.omit(airquality)
+summary(N_airquality)
+
+##KNN모델을 사용하여 K=3인 경우 결측값 대체후 데이터를 저장하고 기술 통계량을 출력하라
+library(VIM)
+S_airquality<-kNN(airquality, k=3)
+dim(S_airquality)
+dim(airquality)
+View(S_airquality)
+summary(S_airquality)
+
+##그 외 결측값 대체하는 방법을 알아보고 적용해 보아라 (apply()사용 코드 작성)
+apply(airquality[, 1:6], 2, sum, na.rm = TRUE)
+apply(airquality[, 1:6], 2, mean, na.rm = TRUE)
+apply(airquality[, 1:6], 2, min, na.rm = TRUE)

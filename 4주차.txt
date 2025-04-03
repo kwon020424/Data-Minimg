@@ -1,0 +1,61 @@
+install.packages("dplyr")
+library(dplyr)
+
+nrow(mtcars)
+str(mtcars)
+
+##fiter 데이터 추출
+filter(mtcars, cyl == 4)
+filter(mtcars, cyl >= 6 & mpg > 20)
+
+##오름차순 정렬
+head(arrange(mtcars, wt))
+
+##오름차순 정렬 -> 내림차순 정렬
+head(arrange(mtcars, mpg, desc(wt)))
+
+##열 추가
+head(mutate(mtcars, years = "1974"))
+head(mutate(mtcars, mpg_rank = rank(mpg)))
+
+##중복 값 제거
+distinct(mtcars, cyl)
+distinct(mtcars, gear)
+
+##여러 개 열에서 중복 값 제거
+distinct(mtcars, cyl, gear)
+
+##데이터 요약
+summarise(mtcars, cyl_mean = mean(cyl), cyl_min = min(cyl), cyl_max = max(cyl))
+summarise(mtcars, mean(cyl), min(cyl), max(cyl))
+
+##그룹별로 요약
+gr_cyl <- group_by(mtcars, cyl)
+summarise(gr_cyl, n())
+
+gr_cyl <- group_by(mtcars, cyl)
+summarise(gr_cyl, n_distinct(gear))
+
+##샘플 데이터 10개 추출
+sample_n(mtcars, 10)
+
+##전체 데이터의 20%를 샘플로 추출
+sample_frac(mtcars, 0.2)
+
+##파이프 연산자로 그룹별 요약
+group_by(mtcars, cyl) %>% summarise(n())
+
+##파이프 연산자 없이 순위 기준으로 정렬
+mp_rank <- mutate(mtcars, mpg_rank = rank(mpg))
+arrange(mp_rank, mpg_rank)
+
+##파이프 연산자를 사용하여 순위 기준으로 정렬
+mutate(mtcars, mpg_rank = rank(mpg)) %>% arrange(mpg_rank)
+
+##문제 : cyl 별로 그룹화하여 마력(hp)가 가장 높은 "차" 찾기
+library(dplyr)
+
+mtcars %>%
+  group_by(cyl) %>%
+  filter(hp == max(hp)) %>%
+  arrange(cyl, desc(hp))

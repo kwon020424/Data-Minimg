@@ -1,0 +1,72 @@
+#문제1
+pairs(trees)
+cov(trees)
+cor(trees)
+cor.test(trees$Girth, trees$Volume)
+cor.test(trees$Girth, trees$Height)
+cor.test(trees$Volume, trees$Height)
+
+#문제2
+
+#회귀 분석이란 하나 이상의 독립변수로 부터 종속변수를 예측하는 방법으로 
+#종속 변수와 연관된 독립변수를 발견
+#관련된 변수들의 관계의 형태를 서술
+#독립 변수로부터 종속변수를 예측하는 방정식 제시
+#타당성검토항목으로 잔차의 선형성, 등분산성, 정규성 및 독립성이 있다.
+
+
+#문제3
+
+#선형성을 높이기 위해 사용하는 방법은 종속변수의 변환이 있다,
+#1 종속변수의 정규성을 살펴본다.
+#2 회귀식 모델을 세워 회귀 모형을 검정한다.
+#3종속변수를 log(),sqrt()로 변환시켜 각각 회귀모형을 세우고 모델을 검정한다.
+#4 결론을 도출한다.
+
+#문제4
+data(cars)
+str(cars)
+library(psych)
+describe(cars)
+hist(cars$dist)
+qqnorm(cars$dist)
+qqline(cars$dist, col = 'red')
+shapiro.test(cars$dist)
+fit1 <- lm(cars$dist~cars$speed)
+summary(fit1)
+abline(fit1,col = "red")
+plot(log(cars$dist)~cars$speed)
+fit2<-lm(log(cars$dist)~cars$speed)
+summary(fit2)
+abline(fit2)
+plot(sqrt(cars$dist)~cars$speed)
+fit3<-lm(sqrt(cars$dist)~cars$speed)
+summary(fit3)
+abline(fit3)
+
+
+#문제5
+class(state.x77)
+attributes(state.x77)
+head(state.x77)
+states <- data.frame(state.x77[,c("Income","Illiteracy","Murder","Frost")])
+library(psych)
+cor.plot(states)
+fit<-lm(Murder~Income+Illiteracy+Frost, data=states)
+summary(fit)
+library(car)
+durbinWatsonTest(fit)
+states2 <- data.frame(state.x77[,c("Population","Income","Illiteracy","Murder","Frost")])
+fit2 <- lm(Murder~Population+Income+Illiteracy+Frost, data=states2)
+op<-par(mfrow = c(2,2))
+plot(fit2)
+par(op)
+outlierTest(fit2)
+qqPlot(fit2, labels= row.names(states2), simulate = T)
+rownames(states2)
+fit3 <- lm(Murder~Population+Income+Illiteracy+Frost, data=states2[-28,])
+summary(fit3)
+anova(fit,fit2)
+AIC(fit,fit2)
+library(MASS)
+stepAIC(fit2)

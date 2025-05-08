@@ -1,10 +1,12 @@
 #문제1
+#공분산/상관계수 구하기
 pairs(trees)
 cov(trees)
 cor(trees)
-cor.test(trees$Girth, trees$Volume)
-cor.test(trees$Girth, trees$Height)
-cor.test(trees$Volume, trees$Height)
+##상관관계 검정하기
+cor.test(trees$Girth, trees$Volume) ## Girth 와 Volume 분석
+cor.test(trees$Girth, trees$Height) ## Girth 와 Height 분석
+cor.test(trees$Volume, trees$Height) ## Volume 와 Height 분석
 
 #문제2
 
@@ -17,56 +19,72 @@ cor.test(trees$Volume, trees$Height)
 
 #문제3
 
-#선형성을 높이기 위해 사용하는 방법은 종속변수의 변환이 있다,
+#선형성을 높이기 위해 사용하는 방법은 종속변수의 변환이 있다.
 #1 종속변수의 정규성을 살펴본다.
 #2 회귀식 모델을 세워 회귀 모형을 검정한다.
 #3종속변수를 log(),sqrt()로 변환시켜 각각 회귀모형을 세우고 모델을 검정한다.
 #4 결론을 도출한다.
 
 #문제4
+#종속변수의 변환
 data(cars)
 str(cars)
 library(psych)
 describe(cars)
 hist(cars$dist)
+##dist 의 정규성 검정
 qqnorm(cars$dist)
 qqline(cars$dist, col = 'red')
 shapiro.test(cars$dist)
+##회귀식 모형 분석
 fit1 <- lm(cars$dist~cars$speed)
 summary(fit1)
 abline(fit1,col = "red")
 plot(log(cars$dist)~cars$speed)
+##로그변환 회귀식 모형 분석
 fit2<-lm(log(cars$dist)~cars$speed)
 summary(fit2)
 abline(fit2)
 plot(sqrt(cars$dist)~cars$speed)
+##ROOT변환 회귀식 모형 분석
 fit3<-lm(sqrt(cars$dist)~cars$speed)
 summary(fit3)
 abline(fit3)
 
 
 #문제5
+##tate.x77 데이터 살펴보기 
 class(state.x77)
 attributes(state.x77)
 head(state.x77)
+##State.x77 데이터중 Murder(자살률),Income(연봉), Illiteracy(문맹률),Population(인구) 만 선정하여
+##데이터 프레임으로 다시 구성 후 중회귀분석 실시
 states <- data.frame(state.x77[,c("Income","Illiteracy","Murder","Frost")])
+##상관과계 그림 그리기
 library(psych)
 cor.plot(states)
+##상관 관계 분석
 fit<-lm(Murder~Income+Illiteracy+Frost, data=states)
 summary(fit)
+##잔차의 독립성
 library(car)
 durbinWatsonTest(fit)
+##변수 추가하여 적합모델찾기
 states2 <- data.frame(state.x77[,c("Population","Income","Illiteracy","Murder","Frost")])
 fit2 <- lm(Murder~Population+Income+Illiteracy+Frost, data=states2)
 op<-par(mfrow = c(2,2))
 plot(fit2)
 par(op)
+##이상치 조사
 outlierTest(fit2)
 qqPlot(fit2, labels= row.names(states2), simulate = T)
 rownames(states2)
 fit3 <- lm(Murder~Population+Income+Illiteracy+Frost, data=states2[-28,])
 summary(fit3)
+##모형 비교 및 최선의 모형 선택
+##Anova test : 두 모형간의 평균의 차이를 통해 모델의 성능을 판단.
 anova(fit,fit2)
+##모형의 AIC 값 비교하기 : 모델의 복잡성과 데이터 적합도의 균형값, 작을수록 좋은 모델
 AIC(fit,fit2)
 library(MASS)
 stepAIC(fit2)

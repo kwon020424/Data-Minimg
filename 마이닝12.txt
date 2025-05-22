@@ -1,0 +1,61 @@
+##One Way Anova
+library(multcomp)
+data("cholesterol")
+head(cholesterol)
+chol<-cholesterol[1:30,]
+chol$trt<-factor(chol$trt, levels=c("1times","2times", "4times"),labels = c("drugA","drugB","drugC"))
+out<-lm(response~trt, data=chol)
+summary(out)
+
+##분산분석(anova)실시시
+anova(out)
+
+##Dunnett방법
+out<-lm(response~trt, data=chol)
+dunnett<-glht(out, linfct =mcp(trt="Dunnett"))
+summary(dunnett)
+
+#Tukey 방법
+out<-lm(response~trt, data=chol)
+tukey<-glht(out, linfct =mcp(trt="Tukey"))
+summary(tukey)
+
+##taplly
+##tapply(종속변수, 독립변수, 통계량) : 종속변수 len, 독립변수 supp, does에 대한 통계량 구하기 
+attach(ToothGrowth)
+levels(ToothGrowth$supp)
+tapply(len, supp, mean)
+tapply(len, dose, mean)
+tapply(len, list(supp, dose), mean)
+aggregate(len, list(supp, dose), mean)
+##독립변수 범주형으로 변환
+ToothGrowth$supp <-factor(ToothGrowth$supp)
+ToothGrowth$dose <-factor(ToothGrowth$dose)
+levels(ToothGrowth$supp)
+levels(ToothGrowth$dose)
+##회귀분석 lm()
+lm(len~supp*dose,data = ToothGrowth)
+##분산분석 anova()실시
+out<-lm(len~supp*dose, data=ToothGrowth)
+anova(out)
+out<-lm(len~supp+dose+supp*dose, data=ToothGrowth)
+anova(out)
+
+##다중비교
+##Dunnett방법 glht() : General Linear Hypothesis Test / mcp() : Multiple Comparison Point 
+out1<-lm(len~dose, data=ToothGrowth)
+dunnett<-glht(out1, linfct =mcp(dose="Dunnett"))
+summary(dunnett)
+
+out2<-lm(len~supp, data=ToothGrowth)
+dunnett2<-glht(out2, linfct =mcp(supp="Dunnett"))
+summary(dunnett2)
+
+#Tukey 방법
+out3<-lm(len~dose, data=ToothGrowth)
+tukey1<-glht(out3, linfct =mcp(dose="Tukey"))
+summary(tukey1)
+
+out4<-lm(len~supp, data=ToothGrowth)
+tukey2<-glht(out4, linfct =mcp(supp="Tukey"))
+summary(tukey2)

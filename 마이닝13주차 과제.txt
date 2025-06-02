@@ -1,0 +1,83 @@
+##패키지 및 데이터
+install.packages("carData")
+data("Titanic")
+df <- as.data.frame(Titanic)
+df_full <- df[rep(1:nrow(df), df$Freq), 1:4]
+str(df_full)
+head(df_full)
+library(pROC)
+
+# 그래프 2x2 배열로 설정
+par(mfrow = c(2, 2))
+
+# Survived에 따른 Class 분포 (숫자형으로 변환하여 시각화)
+boxplot(as.numeric(Class) ~ Survived, data = df_full,
+        main = "Class by Survived",
+        col = c("lightblue", "lightgreen"))
+
+# Survived에 따른 Sex 분포
+boxplot(as.numeric(Sex) ~ Survived, data = df_full,
+        main = "Sex by Survived",
+        col = c("lightblue", "lightgreen"))
+
+# Survived에 따른 Age 분포
+boxplot(as.numeric(Age) ~ Survived, data = df_full,
+        main = "Age by Survived",
+        col = c("lightblue", "lightgreen"))
+
+# Class별 Survived 비율
+boxplot(as.numeric(Survived) ~ Class, data = df_full,
+        main = "Survived by Class",
+        col = c("lightblue", "lightgreen", "pink", "gray"))
+
+# 레이아웃 복원
+par(mfrow = c(1, 1))
+
+##수치형이 없어 상관관계분석을 위해 카이제곱 검정
+# Survived와 Class의 관계
+chisq.test(table(df_full$Survived, df_full$Class))
+
+# Survived와 Sex의 관계
+chisq.test(table(df_full$Survived, df_full$Sex))
+
+# Survived와 Age의 관계
+chisq.test(table(df_full$Survived, df_full$Age))
+
+# 모자이크 플롯으로 관계 시각화(원래 없는거)
+mosaicplot(table(df_full$Survived, df_full$Class),
+           main = "Survived vs Class",
+           color = TRUE)
+
+# 생존 여부를 숫자로 변환 (Yes = 1, No = 0)
+df_full$Survived01 <- ifelse(df_full$Survived == "Yes", 1, 0)
+
+# 로지스틱 회귀 모델 생성
+logit_model <- glm(Survived01 ~ Class + Sex + Age, data = df_full, family = binomial)
+
+# 모델 요약
+summary(logit_model)
+
+# 모델 평가 지표
+##Null Deviance	독립변수 없이 예측한
+##deviance Residual Deviance	/실제 모델의 deviance (작을수록 좋음)
+##AIC	모델의 적합도 + 복잡도 고려한 값 (작을수록 좋음)
+cat("Null Deviance:", logit_model$null.deviance, "\n")
+cat("Residual Deviance:", logit_model$deviance, "\n")
+cat("AIC:", logit_model$aic, "\n")
+
+# 예측 확률값
+prob <- predict(logit_model, type = "response")
+
+# 실제값
+actual <- df_full$Survived01
+
+# ROC 곡선 그리기
+##ROC 곡선: 예측 모델의 민감도(재현율) vs. 1-특이도 그래프
+##AUC (Area Under Curve):0.5에 가까우면 랜덤 분류 수준,1에 가까울수록 완벽한 분류 모델,일반적으로 0.7 이상이면 양호한 모델
+roc_obj <- roc(actual, prob)
+plot(roc_obj, col = "blue", main = "ROC Curve")
+auc(roc_obj)
+
+## Titanic 생존자 예측을 위한 로지스틱 회귀 분석 결과, 클래스, 성별, 연령 모두 생존 확률에 유의미한 영향을 미쳤다. 
+##특히 여성일수록, 어린이일수록 생존 가능성이 높았고, 등급이 낮아질수록 생존 가능성(log-odds)이 유의미하게 낮아졌다. 
+##모델의 residual deviance와 AIC 모두 비교적 낮은 수준으로, 모델의 설명력과 적합도 또한 양호한 편이다.

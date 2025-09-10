@@ -1,0 +1,72 @@
+##단순 베이즈 분류
+##1. 데이터 불러오기
+data("iris")
+head(iris)
+
+##2. 패키지 설치 및 나이브베이즈 분석 실시
+##각 변수별 사전확률 및 조건부확률 계산
+library(e1071)
+b<-naiveBayes(Species~., data = iris)
+b
+
+##3, 예측을 통한 사후확률 계산
+pb<-predict(b, newdata=iris)
+pb
+
+##4. 정오분률 계산하기
+t<-table(pb, iris$Species)
+t
+#정확도
+sum(diag(t))/sum(t)
+1-sum(diag(t))/sum(t)
+
+##"caret"패키지로 정분류률 출력하기
+library(caret)
+cpb<-confusionMatrix(pb, reference=iris$Species, positive = '1')
+cpb
+
+#예제1
+##decision Tree
+library(rpart)
+data(iris)
+iris
+mp<- rpart(Species ~.,data=iris)
+summary(mp)
+pmp<-predict(mp, newdata=iris, type="class")
+pm_onn<-confusionMatrix(pmp, iris$Species)
+pm_con<-confusionMatrix(pmp, iris$Species)
+pm_onn$table
+pm_con$rable
+
+##예제2
+url <- "https://cran.r-project.org/src/contrib/Archive/ElemStatLearn/ElemStatLearn_2015.6.26.2.tar.gz"
+install.packages(url, repos = NULL, type = "source")
+install.packages("ElemStatLearn")
+library(ElemStatLearn)
+data("spam")
+str(spam)
+
+##패키지 설치
+#klaR의 NaiceBayes 사용 (e1071과 다름)
+library(klaR)
+train<-sample(1:nrow(spam), floor(nrow(spam)*0.6), replace = FALSE)
+str(train)
+m_klar <- NaiveBayes(spam~., data = spam[train, ])
+#원하던 2x4 시각화
+par(mfrow = c(2,4))
+plot(m_klar)
+par(mfrow = c(1,1))
+
+##예제3
+install.packages("e1071")
+library(e1071)
+install.packages("mlbench")
+data(HouseVotes84, package="mlbench")
+head(HouseVotes84)
+summary(HouseVotes84)
+model <- NaiveBayes(Class ~ ., data = HouseVotes84)
+pred <- predict(model, HouseVotes84[,-1])
+tab<-table(pred, HouseVotes84$Class)
+tab
+table(HouseVotes84$Class)
+sum(tab[row(tab)==col(tab)])/sum(tab)

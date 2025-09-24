@@ -1,0 +1,64 @@
+##knn 인접이웃 분류 알고리즘
+##3차원 데이터
+data("iris3")
+head(iris3)
+str(iris3)
+train <- rbind(iris3[1:25,,1], iris3[1:25,,2], iris3[1:25,,3])
+test <- rbind(iris3[26:50,,1], iris3[26:50,,2], iris3[26:50,,3])
+cl <- factor(c(rep("setosa",25), rep("versicolor",25), rep("virginica",25) ))
+library(class)
+iris3_model <- knn(train, test, cl, k=3, prob = TRUE)
+table(cl, iris3_model, dnn = c("Actual", "Predicted"))
+
+library(class)
+data("iris")
+##7:3 으로 나누기
+idx <- sample(1:nrow(iris), as.integer(0.7*nrow(iris)))
+trainIris <- iris[idx,]
+dim(trainIris)
+testIris <- iris[-idx,]
+dim(testIris)
+iris_model <- knn(trainIris[-5], testIris[-5], trainIris$Species, k=3)
+table(iris_model)
+table(testIris$Species, iris_model, dnn = c("Actual", "Predicted"))
+
+##비정규화
+f <- knn(Species~., trainIris, testIris, stand = FALSE, k=3)
+table(testIris[, 'Species'], f)
+
+##정규화
+f2 <- knn(Species~., trainIris, testIris, stand = TRUE, k=3)
+table(testIris[, 'Species'], f2)
+
+library(kknn)
+m <- dim(iris)[1]
+val <- sample(1:m, size = round(m/3), replace=FALSE, prob = rep(1/m,m))
+iris.learn <- iris[-val,]
+iris.val <- iris[val,]
+
+cv <- train.kknn(Species~., iris.learn, iris.val, ks = seq(1, 50, by=2), scale=F)
+cv
+
+##4 caret 기반 knn분석
+library(ISLR)
+library(caret)
+
+##데이터 확인
+data(Smarket)
+str(Smarket)
+set.seed(100)
+idxTrain <- createDataPartition(y = Smarket$Direction, p = 0.75, list = FALSE)
+train <- Smarket[idxTrain,]
+test <- Smarket[-idxTrain,]
+
+##전처리(중심화, 척도화)
+##훈련 뎅;터 목적변수 제외하고 중심화, 척도화 진행
+trainX <- train[, 1:8]
+str(trainX)
+
+#전처리 객체 생성
+preproc <- preProcess(trainX, method = c("center", "scale"))
+ctrl <- trainControl(method = "repeatedcv", repeats = 3)
+preproc
+knnFit <- train(Direction~., data = train, method = "knn", trControl = ctrl, preProcess = c("center", "scale"), tuneLength = 20)
+knnFit

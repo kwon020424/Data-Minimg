@@ -1,0 +1,31 @@
+##인공신경망
+##{nnet}의 nnet()함수 사용
+library(nnet)
+data("iris")
+nn_iris<-nnet(Species~., data = iris, size =2, rang= 0.1, decay = 5e-4, maxit =200)
+##size : 노드 수, rang : 가중치 범워 [-0.1, 0.1]
+#weight decay : 모수 0, maxit(반복횟수) 200
+summary(nn_iris)
+library(devtools)
+source_url('https://gist.githubusercontent.com/Peque/41a9e20d6687f2f3108d/raw/85e14f3a292e126f1454864427e3a189c2fe33f3/nnet_plot_update.r')
+plot.nnet(nn_iris)
+p<-predict(nn_iris, iris, type = "class")
+table(iris$Species, p, dnn = c("Actual", "Predicted"))
+##오분률
+t<-table(iris$Species, p, dnn = c("Actual", "Predicted"))
+##정확도
+a<-sum(diag(t))/sum(t)
+##오분률
+1-a
+nn_iris2<-nnet(Species~., data = iris, size =2, rang= 0.1, decay = 5e-4, maxit =200)
+nn_iris5<-nnet(Species~., data = iris, size =5, rang= 0.1, decay = 5e-4, maxit =200)
+nn_iris10<-nnet(Species~., data = iris, size =10, rang= 0.1, decay = 5e-4, maxit =200)
+plot.nnet(nn_iris2)
+plot.nnet(nn_iris5)
+plot.nnet(nn_iris10)
+p2<-predict(nn_iris2,iris, type = "class")
+table(iris$Species, p2, dnn = c("Actual","Predicted"))
+p5<-predict(nn_iris5,iris, type = "class")
+table(iris$Species, p5, dnn = c("Actual","Predicted"))
+p10<-predict(nn_iris10,iris, type = "class")
+table(iris$Species, p10, dnn = c("Actual","Predicted"))
